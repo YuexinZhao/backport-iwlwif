@@ -508,7 +508,7 @@ int iwl_finish_nic_init(struct iwl_trans *trans)
 	iwl_set_bit(trans, CSR_GP_CNTRL,
 		    BIT(trans->cfg->csr->flag_init_done));
 
-	if (trans->cfg->device_family == IWL_DEVICE_FAMILY_8000)
+	if (trans->cfg->device_family >= IWL_DEVICE_FAMILY_8000)
 		udelay(2);
 
 	/*
@@ -521,7 +521,7 @@ int iwl_finish_nic_init(struct iwl_trans *trans)
 			   BIT(trans->cfg->csr->flag_mac_clock_ready),
 			   25000);
 	if (err < 0)
-		IWL_DEBUG_INFO(trans, "Failed to wake NIC\n");
+		IWL_DEBUG_INFO(trans, "Failed to wake NIC  0x%x\n", iwl_read32(trans, CSR_GP_CNTRL));
 
 	if (trans->cfg->bisr_workaround) {
 		/* ensure BISR shift has finished */
