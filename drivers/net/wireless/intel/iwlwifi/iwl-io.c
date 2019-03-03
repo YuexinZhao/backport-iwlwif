@@ -507,6 +507,9 @@ int iwl_finish_nic_init(struct iwl_trans *trans)
 	 */
 	iwl_set_bit(trans, CSR_GP_CNTRL,
 		    BIT(trans->cfg->csr->flag_init_done));
+	iwl_read32(trans, CSR_GP_CNTRL);
+	iwl_set_bit(trans, CSR_GP_CNTRL,
+		    BIT(trans->cfg->csr->flag_init_done));
 
 	if (trans->cfg->device_family >= IWL_DEVICE_FAMILY_8000)
 		udelay(2);
