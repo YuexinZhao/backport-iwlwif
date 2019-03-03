@@ -3450,6 +3450,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	struct iwl_trans *trans;
 	int ret, addr_size;
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	ret = pcim_enable_device(pdev);
 	if (ret)
 		return ERR_PTR(ret);
@@ -3460,6 +3461,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	else
 		trans = iwl_trans_alloc(sizeof(struct iwl_trans_pcie),
 					&pdev->dev, cfg, &trans_ops_pcie);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	if (!trans)
 		return ERR_PTR(-ENOMEM);
@@ -3479,6 +3481,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	}
 
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (!cfg->base_params->pcie_l1_allowed) {
 		/*
 		 * W/A - seems to solve weird behavior. We need to remove this
@@ -3489,6 +3492,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 				       PCIE_LINK_STATE_L1 |
 				       PCIE_LINK_STATE_CLKPM);
 	}
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	trans_pcie->def_rx_queue = 0;
 
@@ -3503,17 +3507,23 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	}
 	trans->max_skb_frags = IWL_PCIE_MAX_FRAGS(trans_pcie);
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	pci_set_master(pdev);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	ret = pci_set_dma_mask(pdev, DMA_BIT_MASK(addr_size));
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (!ret)
 		ret = pci_set_consistent_dma_mask(pdev,
 						  DMA_BIT_MASK(addr_size));
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (ret) {
 		ret = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
+		pr_err("%s: %d\n", __func__, __LINE__);
 		if (!ret)
 			ret = pci_set_consistent_dma_mask(pdev,
 							  DMA_BIT_MASK(32));
+		pr_err("%s: %d\n", __func__, __LINE__);
 		/* both attempts failed: */
 		if (ret) {
 			dev_err(&pdev->dev, "No suitable DMA available\n");
@@ -3521,13 +3531,17 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 		}
 	}
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	ret = pcim_iomap_regions_request_all(pdev, BIT(0), DRV_NAME);
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (ret) {
 		dev_err(&pdev->dev, "pcim_iomap_regions_request_all failed\n");
 		goto out_no_pci;
 	}
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	trans_pcie->hw_base = pcim_iomap_table(pdev)[0];
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (!trans_pcie->hw_base) {
 		dev_err(&pdev->dev, "pcim_iomap_table failed\n");
 		ret = -ENODEV;
@@ -3536,12 +3550,17 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 
 	/* We disable the RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
+	pr_err("%s: %d\n", __func__, __LINE__);
 	pci_write_config_byte(pdev, PCI_CFG_RETRY_TIMEOUT, 0x00);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	trans_pcie->pci_dev = pdev;
+	pr_err("%s: %d\n", __func__, __LINE__);
 	iwl_disable_interrupts(trans);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	trans->hw_rev = iwl_read32(trans, CSR_HW_REV);
+	pr_err("%s: %d\n", __func__, __LINE__);
 	if (trans->hw_rev == 0xffffffff) {
 		dev_err(&pdev->dev, "HW_REV=0xFFFFFFFF, PCI issues?\n");
 		ret = -EIO;
@@ -3557,23 +3576,29 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	if (trans->cfg->device_family >= IWL_DEVICE_FAMILY_8000) {
 		unsigned long flags;
 
+		pr_err("%s: %d\n", __func__, __LINE__);
 		trans->hw_rev = (trans->hw_rev & 0xfff0) |
 				(CSR_HW_REV_STEP(trans->hw_rev << 2) << 2);
 
+		pr_err("%s: %d\n", __func__, __LINE__);
 		ret = iwl_pcie_prepare_card_hw(trans);
 		if (ret) {
 			IWL_WARN(trans, "Exit HW not ready\n");
 			goto out_no_pci;
 		}
+		pr_err("%s: %d\n", __func__, __LINE__);
 
 		/*
 		 * in-order to recognize C step driver should read chip version
 		 * id located at the AUX bus MISC address space.
 		 */
+		pr_err("%s: %d\n", __func__, __LINE__);
 		ret = iwl_finish_nic_init(trans);
+		pr_err("%s: %d - ret = %d\n", __func__, __LINE__, ret);
 		if (ret)
 			goto out_no_pci;
 
+		pr_err("%s: %d\n", __func__, __LINE__);
 		if (iwl_trans_grab_nic_access(trans, &flags)) {
 			u32 hw_step;
 
@@ -3589,12 +3614,15 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 						(SILICON_C_STEP << 2);
 			iwl_trans_release_nic_access(trans, &flags);
 		}
+		pr_err("%s: %d\n", __func__, __LINE__);
 	}
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	IWL_DEBUG_INFO(trans, "HW REV: 0x%0x\n", trans->hw_rev);
 
 #if IS_ENABLED(CPTCFG_IWLMVM) || IS_ENABLED(CPTCFG_IWLFMAC)
 	trans->hw_rf_id = iwl_read32(trans, CSR_HW_RF_ID);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	if (cfg == &iwlax210_2ax_cfg_so_hr_a0) {
 		if (trans->hw_rev == CSR_HW_REV_TYPE_TY) {
@@ -3654,6 +3682,7 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 			trans->cfg = &iwl22000_2ac_cfg_hr;
 		}
 	}
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	/*
 	 * The RF_ID is set to zero in blank OTP so read version
@@ -3684,7 +3713,9 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
 	}
 #endif
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	iwl_pcie_set_interrupt_capa(pdev, trans);
+	pr_err("%s: %d\n", __func__, __LINE__);
 	trans->hw_id = (pdev->device << 16) + pdev->subsystem_device;
 	snprintf(trans->hw_id_str, sizeof(trans->hw_id_str),
 		 "PCI ID: 0x%04X:0x%04X", pdev->device, pdev->subsystem_device);

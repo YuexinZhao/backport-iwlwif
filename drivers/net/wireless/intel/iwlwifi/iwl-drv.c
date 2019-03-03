@@ -1911,6 +1911,7 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 	struct iwl_drv *drv;
 	int ret;
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	drv = kzalloc(sizeof(*drv), GFP_KERNEL);
 	if (!drv) {
 		ret = -ENOMEM;
@@ -1930,6 +1931,7 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 	iwl_load_fw_dbg_tlv(drv->trans->dev, drv->trans);
 #endif
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 #ifdef CPTCFG_IWLWIFI_DEBUGFS
 	/* Create the device debugfs entries. */
 	drv->dbgfs_drv = debugfs_create_dir(dev_name(trans->dev),
@@ -1939,15 +1941,18 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 	drv->trans->dbgfs_dir = debugfs_create_dir("trans", drv->dbgfs_drv);
 #endif
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 #ifdef CPTCFG_IWLWIFI_DEVICE_TESTMODE
 	iwl_tm_gnl_add(drv->trans);
 #endif
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	ret = iwl_request_firmware(drv, true);
 	if (ret) {
 		IWL_ERR(trans, "Couldn't request the fw\n");
 		goto err_fw;
 	}
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 #if IS_ENABLED(CPTCFG_IWLXVT)
 	ret = iwl_create_sysfs_file(drv);

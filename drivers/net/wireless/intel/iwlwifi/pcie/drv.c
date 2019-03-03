@@ -813,6 +813,7 @@ static int iwl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (WARN_ONCE(!cfg->csr, "CSR addresses aren't configured\n"))
 		return -EINVAL;
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	iwl_trans = iwl_trans_pcie_alloc(pdev, ent, cfg);
 	if (IS_ERR(iwl_trans))
 		return PTR_ERR(iwl_trans);
@@ -837,6 +838,8 @@ static int iwl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		iwl_trans->cfg = cfg_7265d;
 	}
 #endif
+
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 #if IS_ENABLED(CPTCFG_IWLMVM) || IS_ENABLED(CPTCFG_IWLFMAC)
 	if (iwl_trans->cfg->rf_id && cfg == &iwl22000_2ac_cfg_hr_cdb &&
@@ -864,14 +867,18 @@ static int iwl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 #endif
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	pci_set_drvdata(pdev, iwl_trans);
 	iwl_trans->drv = iwl_drv_start(iwl_trans);
+	pr_err("%s: %d\n", __func__, __LINE__);
 
 	if (IS_ERR(iwl_trans->drv)) {
+		pr_err("%s: %d\n", __func__, __LINE__);
 		ret = PTR_ERR(iwl_trans->drv);
 		goto out_free_trans;
 	}
 
+	pr_err("%s: %d\n", __func__, __LINE__);
 	/* register transport layer debugfs here */
 	iwl_trans_pcie_dbgfs_register(iwl_trans);
 
